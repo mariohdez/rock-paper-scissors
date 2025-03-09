@@ -10,7 +10,7 @@ type RoundWriter interface {
 }
 
 type MatchWriter interface {
-	WriteMatchOutcome(user1, user2 *user.Player) error
+	WriteMatchOutcome(outcome *MatchOutcome) error
 }
 
 type WeaponReader interface {
@@ -23,6 +23,8 @@ type Match struct {
 	matchWriter  MatchWriter
 	weaponReader WeaponReader
 	winsNeeded   int
+	maxDraws     int
+	numDraws     int
 }
 
 func NewMatch(numRounds int, user1, user2 *user.Player, weaponReader WeaponReader, roundWriter RoundWriter, matchWriter MatchWriter) *Match {
@@ -33,13 +35,14 @@ func NewMatch(numRounds int, user1, user2 *user.Player, weaponReader WeaponReade
 		roundWriter:  roundWriter,
 		matchWriter:  matchWriter,
 		winsNeeded:   numRounds/2 + 1,
+		maxDraws:     3,
 	}
 }
 
 func (m *Match) Start() error {
-	for m.user1.Wins < m.winsNeeded && m.user2.Wins < m.winsNeeded {
+	for m.user1.Wins < m.winsNeeded && m.user2.Wins < m.winsNeeded && m.numDraws < m.maxDraws {
 		err := m.weaponReader.ReadWeapon(m.user1)
-		if err != nil { // return error here?
+		if err != nil {
 			return err
 		}
 
@@ -48,7 +51,7 @@ func (m *Match) Start() error {
 			return err
 		}
 
-		outcome, err := NewRoundOutcome(m.user1, m.user2)
+		outcome, err := newRoundOutcome(m.user1, m.user2)
 		if err != nil {
 			return err
 		}
@@ -62,7 +65,12 @@ func (m *Match) Start() error {
 		m.resetRound()
 	}
 
-	err := m.matchWriter.WriteMatchOutcome(m.user1, m.user2)
+	matchOutcome, err := newMatchOutcome(m.numDraws, m.maxDraws, m.user1, m.user2)
+	if err != nil {
+		return err
+	}
+
+	err = m.matchWriter.WriteMatchOutcome(matchOutcome)
 	if err != nil {
 		return err
 	}
@@ -72,6 +80,7 @@ func (m *Match) Start() error {
 
 func (m *Match) updateWinner(outcome *RoundOutcome) {
 	if outcome.IsDraw {
+		m.numDraws++
 		return
 	}
 

@@ -12,6 +12,11 @@ type RoundOutcome struct {
 	Loser  *user.Player
 }
 
+type MatchOutcome struct {
+	IsDraw bool
+	Winner *user.Player
+}
+
 func weaponPrecedence() map[model.Weapon]model.Weapon {
 	return map[model.Weapon]model.Weapon{
 		model.Rock:     model.Scissors,
@@ -20,7 +25,7 @@ func weaponPrecedence() map[model.Weapon]model.Weapon {
 	}
 }
 
-func NewRoundOutcome(user1, user2 *user.Player) (*RoundOutcome, error) {
+func newRoundOutcome(user1, user2 *user.Player) (*RoundOutcome, error) {
 	if user1 == nil || user2 == nil {
 		return nil, errors.New("user1 and user2 must not be nil")
 	}
@@ -40,5 +45,24 @@ func NewRoundOutcome(user1, user2 *user.Player) (*RoundOutcome, error) {
 	return &RoundOutcome{
 		Winner: winner,
 		Loser:  loser,
+	}, nil
+}
+
+func newMatchOutcome(numDraws, maxDraws int, user1, user2 *user.Player) (*MatchOutcome, error) {
+	if user1 == nil || user2 == nil {
+		return nil, errors.New("user1 and user2 must not be nil")
+	}
+	if numDraws >= maxDraws {
+		return &MatchOutcome{
+			IsDraw: true,
+		}, nil
+	}
+
+	winner := user1
+	if user2.Wins > user1.Wins {
+		winner = user2
+	}
+	return &MatchOutcome{
+		Winner: winner,
 	}, nil
 }

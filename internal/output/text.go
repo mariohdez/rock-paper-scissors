@@ -3,7 +3,6 @@ package output
 import (
 	"fmt"
 	"github.com/mariohdez/rockpaperscissors/internal/game"
-	"github.com/mariohdez/rockpaperscissors/internal/user"
 	"io"
 )
 
@@ -19,7 +18,7 @@ func NewTextOutcomeWriter(w io.Writer) *TextResultWriter {
 
 func (w *TextResultWriter) WriteRoundOutcome(outcome *game.RoundOutcome) error {
 	if outcome.IsDraw {
-		_, err := fmt.Fprintln(w.writer, "DRAW 🤝⚖️")
+		_, err := fmt.Fprintf(w.writer, "DRAW 🤝⚖️\n\n")
 		if err != nil {
 			return fmt.Errorf("write outcome to writer: %w", err)
 		}
@@ -41,13 +40,16 @@ func (w *TextResultWriter) WriteRoundOutcome(outcome *game.RoundOutcome) error {
 	return nil
 }
 
-func (w *TextResultWriter) WriteMatchOutcome(user1, user2 *user.Player) error {
-	winner := user1
-	if user2.Wins > user1.Wins {
-		winner = user2
+func (w *TextResultWriter) WriteMatchOutcome(outcome *game.MatchOutcome) error {
+	if outcome.IsDraw {
+		_, err := fmt.Fprintf(w.writer, "Great minds think alike 🧠🤝🧠. No winner.\n")
+		if err != nil {
+			return fmt.Errorf("write outcome to writer: %w", err)
+		}
+		return nil
 	}
 
-	_, err := fmt.Fprintf(w.writer, "%s won! Congratulations! 🎉\n", winner.Name)
+	_, err := fmt.Fprintf(w.writer, "%s won! Congratulations! 🎉\n", outcome.Winner.Name)
 	if err != nil {
 		return fmt.Errorf("write outcome to writer: %w", err)
 	}
