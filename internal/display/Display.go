@@ -17,7 +17,7 @@ func New(w io.Writer) *Display {
 	}
 }
 
-func (d *Display) Result(result *game.RoundResult) {
+func (d *Display) RoundResult(result *game.RoundResult) {
 	if result.IsDraw {
 		_, _ = fmt.Fprintf(d.writer, "DRAW 🤝⚖️\n")
 		return
@@ -28,8 +28,8 @@ func (d *Display) Result(result *game.RoundResult) {
 		"%s beat %s: %s beats %s\n\n",
 		result.Winner.Name,
 		result.Loser.Name,
-		result.Winner.Move,
-		result.Loser.Move,
+		result.Winner.Weapon,
+		result.Loser.Weapon,
 	)
 }
 
@@ -39,5 +39,5 @@ func (d *Display) GameResult(user1, user2 *user.User) {
 		winner = user2
 	}
 
-	fmt.Fprintf(d.writer, "%s won! Congratulations! 🎉\n", winner.Name)
+	_, _ = fmt.Fprintf(d.writer, "%s won! Congratulations! 🎉\n", winner.Name)
 }
