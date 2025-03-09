@@ -28,7 +28,10 @@ func (t *TextInputReader) ReadWeapon(user *user.Player) error {
 		}
 
 		if !t.scanner.Scan() {
-			return fmt.Errorf("read from scanner: %w", t.scanner.Err())
+			if err := t.scanner.Err(); err != nil {
+				return fmt.Errorf("read from scanner: %w", t.scanner.Err())
+			}
+			return fmt.Errorf("scanner reached EOF")
 		}
 		userInput := t.scanner.Text()
 		user.Weapon = model.ParseWeapon(userInput)
