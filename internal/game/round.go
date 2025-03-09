@@ -6,7 +6,7 @@ import (
 	"github.com/mariohdez/rockpaperscissors/internal/user"
 )
 
-type RoundResult struct {
+type RoundOutcome struct {
 	IsDraw bool
 	Winner *user.User
 	Loser  *user.User
@@ -20,13 +20,13 @@ func weaponPrecedence() map[model.Weapon]model.Weapon {
 	}
 }
 
-func NewRoundResult(user1, user2 *user.User) (*RoundResult, error) {
+func NewRoundOutcome(user1, user2 *user.User) (*RoundOutcome, error) {
 	if user1 == nil || user2 == nil {
 		return nil, errors.New("user1 and user2 must not be nil")
 	}
 
 	if user1.Weapon == user2.Weapon {
-		return &RoundResult{
+		return &RoundOutcome{
 			IsDraw: true,
 		}, nil
 	}
@@ -37,7 +37,7 @@ func NewRoundResult(user1, user2 *user.User) (*RoundResult, error) {
 		winner = user2
 		loser = user1
 	}
-	return &RoundResult{
+	return &RoundOutcome{
 		Winner: winner,
 		Loser:  loser,
 	}, nil

@@ -3,8 +3,9 @@ package main
 import (
 	"bufio"
 	"github.com/mariohdez/rockpaperscissors/internal/game"
+	"github.com/mariohdez/rockpaperscissors/internal/input"
+	"github.com/mariohdez/rockpaperscissors/internal/output"
 	"github.com/mariohdez/rockpaperscissors/internal/user"
-	"github.com/mariohdez/rockpaperscissors/internal/view"
 	"os"
 )
 
@@ -16,14 +17,19 @@ func main() {
 		Name: "Bob",
 	}
 
-	writer := view.New(os.Stdout)
+	writer := os.Stdout
+	textOutcomeWriter := output.NewTextOutcomeWriter(writer)
 	match := game.NewMatch(
 		3,
 		user1,
 		user2,
-		bufio.NewScanner(os.Stdin),
-		writer,
-		writer,
+		input.NewTextReader(bufio.NewScanner(os.Stdin), writer),
+		textOutcomeWriter,
+		textOutcomeWriter,
 	)
-	match.Start()
+
+	err := match.Start()
+	if err != nil {
+		textOutcomeWriter.WriteMatchError(err)
+	}
 }
