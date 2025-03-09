@@ -8,8 +8,8 @@ import (
 
 type RoundOutcome struct {
 	IsDraw bool
-	Winner *user.User
-	Loser  *user.User
+	Winner *user.Player
+	Loser  *user.Player
 }
 
 func weaponPrecedence() map[model.Weapon]model.Weapon {
@@ -20,7 +20,7 @@ func weaponPrecedence() map[model.Weapon]model.Weapon {
 	}
 }
 
-func NewRoundOutcome(user1, user2 *user.User) (*RoundOutcome, error) {
+func NewRoundOutcome(user1, user2 *user.Player) (*RoundOutcome, error) {
 	if user1 == nil || user2 == nil {
 		return nil, errors.New("user1 and user2 must not be nil")
 	}

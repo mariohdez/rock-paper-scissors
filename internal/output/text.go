@@ -41,7 +41,7 @@ func (w *TextResultWriter) WriteRoundOutcome(outcome *game.RoundOutcome) error {
 	return nil
 }
 
-func (w *TextResultWriter) WriteMatchOutcome(user1, user2 *user.User) error {
+func (w *TextResultWriter) WriteMatchOutcome(user1, user2 *user.Player) error {
 	winner := user1
 	if user2.Wins > user1.Wins {
 		winner = user2

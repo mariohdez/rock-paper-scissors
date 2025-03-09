@@ -20,7 +20,7 @@ func NewTextReader(scanner *bufio.Scanner, writer io.Writer) *TextInputReader {
 	}
 }
 
-func (t *TextInputReader) ReadWeapon(user *user.User) error {
+func (t *TextInputReader) ReadWeapon(user *user.Player) error {
 	for user.Weapon == model.UnknownWeapon {
 		_, err := fmt.Fprintf(t.writer, "%s, please enter your weapon: ", user.Name)
 		if err != nil {

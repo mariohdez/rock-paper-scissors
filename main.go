@@ -10,10 +10,10 @@ import (
 )
 
 func main() {
-	user1 := &user.User{
+	user1 := &user.Player{
 		Name: "Rob",
 	}
-	user2 := &user.User{
+	user2 := &user.Player{
 		Name: "Bob",
 	}
 

@@ -10,22 +10,22 @@ type RoundWriter interface {
 }
 
 type MatchWriter interface {
-	WriteMatchOutcome(user1, user2 *user.User) error
+	WriteMatchOutcome(user1, user2 *user.Player) error
 }
 
 type WeaponReader interface {
-	ReadWeapon(user *user.User) error
+	ReadWeapon(user *user.Player) error
 }
 
 type Match struct {
-	user1, user2 *user.User
+	user1, user2 *user.Player
 	roundWriter  RoundWriter
 	matchWriter  MatchWriter
 	weaponReader WeaponReader
 	winsNeeded   int
 }
 
-func NewMatch(numRounds int, user1, user2 *user.User, weaponReader WeaponReader, roundWriter RoundWriter, matchWriter MatchWriter) *Match {
+func NewMatch(numRounds int, user1, user2 *user.Player, weaponReader WeaponReader, roundWriter RoundWriter, matchWriter MatchWriter) *Match {
 	return &Match{
 		user1:        user1,
 		user2:        user2,
