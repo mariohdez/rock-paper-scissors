@@ -30,6 +30,7 @@ func main() {
 
 	err := match.Start()
 	if err != nil {
-		textOutcomeWriter.WriteMatchError(err)
+		_ = textOutcomeWriter.WriteMatchError(err)
+		os.Exit(1)
 	}
 }

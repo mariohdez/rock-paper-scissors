@@ -17,13 +17,16 @@ func NewTextOutcomeWriter(w io.Writer) *TextResultWriter {
 	}
 }
 
-func (w *TextResultWriter) WriteRoundOutcome(outcome *game.RoundOutcome) {
+func (w *TextResultWriter) WriteRoundOutcome(outcome *game.RoundOutcome) error {
 	if outcome.IsDraw {
-		_, _ = fmt.Fprintln(w.writer, "DRAW 🤝⚖️")
-		return
+		_, err := fmt.Fprintln(w.writer, "DRAW 🤝⚖️")
+		if err != nil {
+			return fmt.Errorf("write outcome to writer: %w", err)
+		}
+		return nil
 	}
 
-	_, _ = fmt.Fprintf(
+	_, err := fmt.Fprintf(
 		w.writer,
 		"%s beat %s: %s beats %s\n\n",
 		outcome.Winner.Name,
@@ -31,17 +34,32 @@ func (w *TextResultWriter) WriteRoundOutcome(outcome *game.RoundOutcome) {
 		outcome.Winner.Weapon,
 		outcome.Loser.Weapon,
 	)
+	if err != nil {
+		return fmt.Errorf("write outcome to writer: %w", err)
+	}
+
+	return nil
 }
 
-func (w *TextResultWriter) WriteMatchOutcome(user1, user2 *user.User) {
+func (w *TextResultWriter) WriteMatchOutcome(user1, user2 *user.User) error {
 	winner := user1
 	if user2.Wins > user1.Wins {
 		winner = user2
 	}
 
-	_, _ = fmt.Fprintf(w.writer, "%s won! Congratulations! 🎉\n", winner.Name)
+	_, err := fmt.Fprintf(w.writer, "%s won! Congratulations! 🎉\n", winner.Name)
+	if err != nil {
+		return fmt.Errorf("write outcome to writer: %w", err)
+	}
+
+	return nil
 }
 
-func (w *TextResultWriter) WriteMatchError(err error) {
-	_, _ = fmt.Fprintln(w.writer, "The match encountered an error:", err)
+func (w *TextResultWriter) WriteMatchError(err error) error {
+	_, writeErr := fmt.Fprintln(w.writer, "The match encountered an error:", err)
+	if writeErr != nil {
+		return fmt.Errorf("write outcome to writer: %w", err)
+	}
+
+	return nil
 }

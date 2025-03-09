@@ -6,11 +6,11 @@ import (
 )
 
 type RoundWriter interface {
-	WriteRoundOutcome(result *RoundOutcome)
+	WriteRoundOutcome(result *RoundOutcome) error
 }
 
 type MatchWriter interface {
-	WriteMatchOutcome(user1, user2 *user.User)
+	WriteMatchOutcome(user1, user2 *user.User) error
 }
 
 type WeaponReader interface {
@@ -44,31 +44,41 @@ func (m *Match) Start() error {
 		}
 
 		err = m.weaponReader.ReadWeapon(m.user2)
-		if err != nil { // return error here??
+		if err != nil {
 			return err
 		}
 
 		outcome, err := NewRoundOutcome(m.user1, m.user2)
-		if err != nil { // return error here?
+		if err != nil {
 			return err
 		}
-		m.updateWinner(outcome)
 
-		m.roundWriter.WriteRoundOutcome(outcome)
+		m.updateWinner(outcome)
+		err = m.roundWriter.WriteRoundOutcome(outcome)
+		if err != nil {
+			return err
+		}
+
 		m.resetRound()
 	}
 
-	m.matchWriter.WriteMatchOutcome(m.user1, m.user2)
+	err := m.matchWriter.WriteMatchOutcome(m.user1, m.user2)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (m *Match) updateWinner(outcome *RoundOutcome) {
-	if !outcome.IsDraw {
-		if outcome.Winner == m.user1 {
-			m.user1.Wins++
-		} else {
-			m.user2.Wins++
-		}
+	if outcome.IsDraw {
+		return
+	}
+
+	if outcome.Winner == m.user1 {
+		m.user1.Wins++
+	} else {
+		m.user2.Wins++
 	}
 }
 
