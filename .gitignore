@@ -1,0 +1,45 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+*.o
+
+# Go build artifacts
+/bin/
+/pkg/
+*.test
+*.prof
+*.trace
+*.sum
+*.syso
+*.a
+
+# Go modules
+go.sum
+vendor/
+
+# IDE and editor files
+.idea/
+*.iml
+*.sublime-workspace
+
+# Logs and system files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Debugging
+*.prof
+*.trace
+
+# Coverage files
+coverage.*
+*.coverprofile
+
+# Local environment files
+.env
+.env.*
+
