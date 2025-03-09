@@ -13,8 +13,8 @@ type RoundOutcome struct {
 }
 
 type MatchOutcome struct {
-	IsDraw bool
-	Winner *user.Player
+	IsDraw     bool
+	WinnerName string
 }
 
 func weaponPrecedence() map[model.Weapon]model.Weapon {
@@ -63,6 +63,6 @@ func newMatchOutcome(numDraws, maxDraws int, user1, user2 *user.Player) (*MatchO
 		winner = user2
 	}
 	return &MatchOutcome{
-		Winner: winner,
+		WinnerName: winner.Name,
 	}, nil
 }

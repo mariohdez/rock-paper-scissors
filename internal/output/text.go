@@ -49,7 +49,7 @@ func (w *TextResultWriter) WriteMatchOutcome(outcome *game.MatchOutcome) error {
 		return nil
 	}
 
-	_, err := fmt.Fprintf(w.writer, "%s won! Congratulations! 🎉\n", outcome.Winner.Name)
+	_, err := fmt.Fprintf(w.writer, "%s won! Congratulations! 🎉\n", outcome.WinnerName)
 	if err != nil {
 		return fmt.Errorf("write outcome to writer: %w", err)
 	}
