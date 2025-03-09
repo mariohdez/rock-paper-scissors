@@ -25,7 +25,7 @@ func (m Weapon) String() string {
 	return weapons[m]
 }
 
-func ToWeapon(input string) Weapon {
+func ParseWeapon(input string) Weapon {
 	input = strings.TrimSpace(strings.ToLower(input))
 
 	if weapon, err := strconv.Atoi(input); err == nil {

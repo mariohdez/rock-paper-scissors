@@ -1,4 +1,4 @@
-package display
+package view
 
 import (
 	"fmt"
@@ -7,24 +7,24 @@ import (
 	"io"
 )
 
-type Display struct {
+type TextResultWriter struct {
 	writer io.Writer
 }
 
-func New(w io.Writer) *Display {
-	return &Display{
+func New(w io.Writer) *TextResultWriter {
+	return &TextResultWriter{
 		writer: w,
 	}
 }
 
-func (d *Display) RoundResult(result *game.RoundResult) {
+func (w *TextResultWriter) WriteRound(result *game.RoundResult) {
 	if result.IsDraw {
-		_, _ = fmt.Fprintf(d.writer, "DRAW 🤝⚖️\n")
+		_, _ = fmt.Fprintln(w.writer, "DRAW 🤝⚖️")
 		return
 	}
 
 	_, _ = fmt.Fprintf(
-		d.writer,
+		w.writer,
 		"%s beat %s: %s beats %s\n\n",
 		result.Winner.Name,
 		result.Loser.Name,
@@ -33,11 +33,11 @@ func (d *Display) RoundResult(result *game.RoundResult) {
 	)
 }
 
-func (d *Display) GameResult(user1, user2 *user.User) {
+func (w *TextResultWriter) WriteMatch(user1, user2 *user.User) {
 	winner := user1
 	if user2.Wins > user1.Wins {
 		winner = user2
 	}
 
-	_, _ = fmt.Fprintf(d.writer, "%s won! Congratulations! 🎉\n", winner.Name)
+	_, _ = fmt.Fprintf(w.writer, "%s won! Congratulations! 🎉\n", winner.Name)
 }
