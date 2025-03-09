@@ -21,9 +21,9 @@ func NewTextReader(scanner *bufio.Scanner, writer io.Writer) *TextInputReader {
 }
 
 func (t *TextInputReader) ReadWeapon(user *user.Player) error {
-	const maxAttempts = 3
+	const maxInvalidAttempts = 3
 	numOfInvalidAttempts := 0
-	for user.Weapon == model.UnknownWeapon && numOfInvalidAttempts < maxAttempts {
+	for user.Weapon == model.UnknownWeapon && numOfInvalidAttempts < maxInvalidAttempts {
 		_, err := fmt.Fprintf(t.writer, "%s, please enter your weapon: ", user.Name)
 		if err != nil {
 			return fmt.Errorf("write prompt to read weapon: %w", err)
@@ -42,7 +42,7 @@ func (t *TextInputReader) ReadWeapon(user *user.Player) error {
 		}
 	}
 
-	if numOfInvalidAttempts >= maxAttempts {
+	if numOfInvalidAttempts >= maxInvalidAttempts {
 		return fmt.Errorf("too many invalid inputs")
 	}
 	return nil
