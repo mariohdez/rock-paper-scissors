@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"github.com/mariohdez/rockpaperscissors/internal/game"
 	"github.com/mariohdez/rockpaperscissors/internal/net/protocol"
 	"github.com/mariohdez/rockpaperscissors/internal/user"
@@ -57,17 +58,13 @@ func orchestrateNewGame(player1Conn, player2Conn net.Conn) {
 	defer player1Conn.Close()
 	defer player2Conn.Close()
 
-	connToName := getNames(player1Conn, player2Conn)
-	player1Name, ok := connToName[player1Conn]
-	if !ok {
+	connToName, err := getNames(player1Conn, player2Conn)
+	if err != nil {
 		log.Println("Could not find player1's name:", player1Conn)
 		return
 	}
-	player2Name, ok := connToName[player2Conn]
-	if !ok {
-		log.Println("Could not find player2's name:", player2Conn)
-		return
-	}
+	player1Name, _ := connToName[player1Conn]
+	player2Name, _ := connToName[player2Conn]
 
 	_ = game.NewMatch(3, &user.Player{
 		Name: player1Name,
@@ -76,16 +73,18 @@ func orchestrateNewGame(player1Conn, player2Conn net.Conn) {
 	}, nil, nil, nil)
 }
 
-func getNames(player1Conn, player2Conn net.Conn) map[net.Conn]string {
+func getNames(player1Conn, player2Conn net.Conn) (map[net.Conn]string, error) {
 	var wg sync.WaitGroup
 	connToName := make(map[net.Conn]string)
 	connToNameLock := sync.Mutex{}
+	errCh := make(chan error, 2)
 	askAndGetName := func(wg *sync.WaitGroup, playerConn net.Conn, connToName map[net.Conn]string, connToNameLock *sync.Mutex) {
 		defer wg.Done()
 		err := protocol.SendMessage(playerConn, protocol.WhatIsYourName, "")
 		if err != nil {
 			log.Println("error receiving message from client:", err)
 			playerConn.Close()
+			errCh <- err
 			return
 		}
 
@@ -93,11 +92,13 @@ func getNames(player1Conn, player2Conn net.Conn) map[net.Conn]string {
 		if err != nil {
 			log.Println("error receiving message from client:", err)
 			playerConn.Close()
+			errCh <- err
 			return
 		}
 		if cmd != protocol.MyNameIs {
 			log.Println("error receiving message from client:", err)
 			playerConn.Close()
+			errCh <- fmt.Errorf("received message from client, but it's not a name")
 			return
 		}
 
@@ -112,7 +113,17 @@ func getNames(player1Conn, player2Conn net.Conn) map[net.Conn]string {
 	go askAndGetName(&wg, player2Conn, connToName, &connToNameLock)
 
 	wg.Wait()
+	close(errCh)
 
-	log.Println("Got both players names")
-	return connToName
+	var errs []error
+	for err := range errCh {
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+	if len(errs) > 0 {
+		return nil, errors.Join(errs...)
+	}
+
+	return connToName, nil
 }
