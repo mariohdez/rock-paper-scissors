@@ -20,6 +20,22 @@ func NewTextReader(scanner *bufio.Scanner, writer io.Writer) *TextInputReader {
 	}
 }
 
+func (t *TextInputReader) ReadName() (string, error) {
+	_, err := fmt.Fprintf(t.writer, "please enter your name: ")
+	if err != nil {
+		return "", fmt.Errorf("write prompt to read name: %w", err)
+	}
+
+	if !t.scanner.Scan() {
+		if err := t.scanner.Err(); err != nil {
+			return "", fmt.Errorf("read from scanner: %w", t.scanner.Err())
+		}
+		return "", fmt.Errorf("scanner reached EOF")
+	}
+
+	return t.scanner.Text(), nil
+}
+
 func (t *TextInputReader) ReadWeapon(user *user.Player) error {
 	const maxInvalidAttempts = 3
 	numOfInvalidAttempts := 0

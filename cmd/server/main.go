@@ -43,6 +43,7 @@ func main() {
 	log.Println("I have received two connections.")
 	handleGame(player1Conn, player2Conn)
 	log.Println("now will kick off game session")
+
 }
 
 func handleGame(player1Conn, player2Conn net.Conn) {
