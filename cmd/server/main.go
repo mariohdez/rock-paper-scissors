@@ -18,12 +18,18 @@ func main() {
 	}
 	defer listener.Close()
 
-	log.Println("Game server listening on", listener.Addr())
 	connChannel := make(chan net.Conn, 2)
-
-	go listenToConnections(listener, connChannel)
-	go kickOffGameSession(connChannel)
-
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		listenToConnections(listener, connChannel)
+	}()
+	go func() {
+		defer wg.Done()
+		kickOffGameSession(connChannel)
+	}()
+	wg.Wait()
 }
 
 func listenToConnections(listener net.Listener, connChannel chan<- net.Conn) {
